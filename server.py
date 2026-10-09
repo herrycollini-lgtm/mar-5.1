@@ -888,6 +888,7 @@ def gestionale_body(row):
         "note": notes[:500],
         "consenso_privacy": True,
         "consenso_marketing": False,
+        "invia_conferma": False,  # il cliente lo avvisa già il sito (SMS o email): niente doppia conferma
     }
 
 

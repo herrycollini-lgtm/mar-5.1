@@ -466,6 +466,28 @@
     });
   }
 
+  // Esito dell'invio al gestionale: si vede solo quando il collegamento è attivo e qualcosa non è (ancora) andato.
+  function gestionaleLine(r) {
+    var stateName = r.gestionale_state;
+    if (!stateName || stateName === "inviata") return null;
+    var box = el("div", "res__notify");
+    if (stateName === "da_inviare" || stateName === "in_corso") {
+      box.classList.add("is-pending");
+      box.append(icon("clock"), el("span", "", "Gestionale: in invio…"));
+    } else if (stateName === "errore_temporaneo") {
+      box.classList.add("is-pending");
+      box.append(icon("clock"), el("span", "", "Gestionale non raggiungibile, riprovo da solo"));
+    } else {
+      box.classList.add("is-error");
+      box.append(icon("alert"), el("span", "", stateName === "rifiutata" ? "Il gestionale l'ha rifiutata: inseriscila a mano" : "Non arrivata al gestionale: inseriscila a mano"));
+    }
+    if (r.gestionale_error) {
+      box.title = r.gestionale_error;
+      if (stateName === "rifiutata" || stateName === "fallita") box.append(el("span", "res__notify-detail", r.gestionale_error));
+    }
+    return box;
+  }
+
   // Esito dell'ultimo messaggio al cliente, con "Invia di nuovo" se qualcosa non è andato.
   function notifyLine(r) {
     var box = el("div", "res__notify");
@@ -571,6 +593,8 @@
       statusWrap.append(statusRow);
       var notify = notifyLine(r);
       if (notify) statusWrap.append(notify);
+      var gestionale = gestionaleLine(r);
+      if (gestionale) statusWrap.append(gestionale);
 
       row.append(time, who, guests, notes, statusWrap);
       listEl.append(row);
